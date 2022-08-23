@@ -15,4 +15,21 @@ class PlaylistsController extends Controller
             Playlist::all()
         );
     }
+
+    public function delete(Playlist $playlist)
+    {
+        $playlist->delete();
+
+        return response(null, 204);
+    }
+
+    public function show(Playlist $playlist)
+    {
+        return Playlist::with(['songs'])->findOrFail($playlist->id);
+    }
+
+    public function edit(Playlist $playlist)
+    {
+        return Playlist::with(['songs'])->find($playlist->id);
+    }
 }

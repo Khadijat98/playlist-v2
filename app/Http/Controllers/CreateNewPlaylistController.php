@@ -13,9 +13,10 @@ class CreateNewPlaylistController extends Controller
         $validated = $request->validate([
             'playlist_name' => 'required|max:255|string',
             'created_by' => 'required|max:255|string',
-            'description' => 'required|max:255|string',
+            'description' => 'required|max:500|string',
             'playlist_image' => 'required|max:255|url',
-            'songs' => 'required|array|min:1'
+            'songs' => 'required|array|min:1|max:30',
+            'songs.*' => 'string'
         ]);
 
         $playlist = Playlist::create($validated);
