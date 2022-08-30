@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PlaylistResource;
+use App\Models\User;
 use App\Models\Playlist;
 use Illuminate\Http\Request;
+use App\Http\Resources\PlaylistResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class PlaylistsController extends Controller
 {
-    public function __invoke()
+    public function index(Request $request)
     {
+        $user = $request->user()->id;
+
         return PlaylistResource::collection(
-            Playlist::all()
+            Playlist::where('created_by', '=', $user)->get()
         );
     }
 

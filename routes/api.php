@@ -8,6 +8,9 @@ use App\Http\Controllers\PlaylistsController;
 use App\Http\Controllers\PlaylistSongsController;
 use App\Http\Controllers\UpdatePlaylistController;
 use App\Http\Controllers\CreateNewPlaylistController;
+use App\Http\Controllers\LoginUserController;
+use App\Http\Controllers\RegisterNewUserController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,21 +29,30 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/hello', HelloController::class);
 
-Route::get('/songs', SongsController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/songs', SongsController::class);
 
-Route::get('/playlists', PlaylistsController::class);
+    Route::get('/playlists', [PlaylistsController::class, 'index']);
 
-Route::post('/playlist', CreateNewPlaylistController::class);
+    Route::post('/playlist', CreateNewPlaylistController::class);
 
-Route::get('/playlist/{playlist}/songs', PlaylistSongsController::class);
+    Route::get('/playlist/{playlist}/songs', PlaylistSongsController::class);
 
-// show the individual playlist
-Route::get('/playlist/{playlist}', [PlaylistsController::class, 'show']);
+    // show the individual playlist
+    Route::get('/playlist/{playlist}', [PlaylistsController::class, 'show']);
 
-// edit the individual playlist - do i need a new controller for this?
-Route::get('playlist/{playlist}/edit', [PlaylistsController::class, 'edit']);
+    // edit the individual playlist
+    Route::get('playlist/{playlist}/edit', [PlaylistsController::class, 'edit']);
 
-// update the individual playlist
-Route::put('/playlist/{playlist}', [UpdatePlaylistController::class, 'update']);
+    // update the individual playlist
+    Route::put('/playlist/{playlist}', [UpdatePlaylistController::class, 'update']);
 
-Route::delete('/playlist/{playlist}', [PlaylistsController::class, 'delete']);
+    Route::delete('/playlist/{playlist}', [PlaylistsController::class, 'delete']);
+
+    Route::get('/user', UserController::class);
+});
+
+
+Route::post('/register', [RegisterNewUserController::class, 'store']);
+
+Route::post('/login', [LoginUserController::class, 'store']);

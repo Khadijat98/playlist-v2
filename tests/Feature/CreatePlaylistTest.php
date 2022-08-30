@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Song;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 // When we make a valid request, it stores a playlist in the database.
@@ -23,12 +25,18 @@ class CreatePlaylistTest extends TestCase
      */
     public function test_when_we_make_a_valid_request_it_stores_a_playlist_in_the_database()
     {
+        $user = User::create([
+            'name' => 'Dan',
+            'email' => 'dan@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
         $song = Song::create([
             'song_name' => 'Song A',
             'song_image' => 'A',
         ]);
 
-        $response = $this->post('/api/playlist', [
+        $response = $this->actingAs($user)->post('/api/playlist', [
             'playlist_name' => 'My favourite songs',
             'created_by' => 'Dan',
             'description' => 'These are all my faves',
@@ -40,7 +48,6 @@ class CreatePlaylistTest extends TestCase
 
         $this->assertDatabaseHas('playlists', [
             'playlist_name' => 'My favourite songs',
-            'created_by' => 'Dan',
             'description' => 'These are all my faves',
             'playlist_image' => 'https://google.com',
         ]);
@@ -50,14 +57,19 @@ class CreatePlaylistTest extends TestCase
 
     public function test_when_we_make_a_valid_request_it_returns_the_playlist()
     {
+        $user = User::create([
+            'name' => 'Dan',
+            'email' => 'dan@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
         $song = Song::create([
             'song_name' => 'Song A',
             'song_image' => 'A',
         ]);
 
-        $response = $this->post('/api/playlist', [
+        $response = $this->actingAs($user)->postJson('/api/playlist', [
             'playlist_name' => 'My favourite songs',
-            'created_by' => 'Dan',
             'description' => 'These are all my faves',
             'playlist_image' => 'https://google.com',
             'songs' => [
@@ -68,7 +80,7 @@ class CreatePlaylistTest extends TestCase
         $response->assertJson([
             'data' => [
                 'playlist_name' => 'My favourite songs',
-                'created_by' => 'Dan',
+                'created_by' => $user->id,
                 'description' => 'These are all my faves',
                 'playlist_image' => 'https://google.com',
                 'songs' => [
@@ -84,12 +96,18 @@ class CreatePlaylistTest extends TestCase
 
     public function test_when_required_data_is_missing_a_422_is_returned()
     {
+        $user = User::create([
+            'name' => 'Dan',
+            'email' => 'dan@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
         $song = Song::create([
             'song_name' => 'Song A',
             'song_image' => 'A',
         ]);
 
-        $response = $this->postJson('/api/playlist', [
+        $response = $this->actingAs($user)->postJson('/api/playlist', [
             'created_by' => 'Dan',
             'description' => 'These are all my faves',
             'playlist_image' => 'https://google.com',
@@ -103,13 +121,18 @@ class CreatePlaylistTest extends TestCase
 
     public function test_when_required_data_is_missing_nothing_is_stored_in_the_database()
     {
+        $user = User::create([
+            'name' => 'Dan',
+            'email' => 'dan@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
         $song = Song::create([
             'song_name' => 'Song A',
             'song_image' => 'A',
         ]);
 
-        $response = $this->post('/api/playlist', [
-            'created_by' => 'Dan',
+        $response = $this->actingAs($user)->post('/api/playlist', [
             'description' => 'These are all my faves',
             'playlist_image' => 'https://google.com',
             'songs' => [

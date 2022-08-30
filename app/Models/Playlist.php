@@ -20,4 +20,9 @@ class Playlist extends Model
     {
         return $this->belongsToMany(Song::class, 'playlist_songs');
     }
+
+    public function userPlaylists()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }
